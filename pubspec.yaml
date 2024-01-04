@@ -17,3 +17,17 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/resto.json
+  fonts:
+    - family: Jakarta
+      fonts:
+       - asset: assets/fonts/PlusJakartaSansRegular.ttf
+       - asset: assets/fonts/PlusJakartaSansBold.ttf
+         weight: 700
+       - asset: assets/fonts/PlusJakartaSansExtraBold.ttf
+         weight: 800
+       - asset: assets/fonts/PlusJakartaSansSemiBold.ttf
+         weight: 600
+       - asset: assets/fonts/PlusJakartaSansItalic.ttf
+         style: italic
