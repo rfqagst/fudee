@@ -33,6 +33,11 @@ class RestoListScreen extends StatelessWidget {
                     future: DefaultAssetBundle.of(context)
                         .loadString('assets/resto.json'),
                     builder: (context, snapshot) {
+                      if (snapshot.data == null) {
+                        return const Center(
+                          child: Text("Tidak Ada data"),
+                        );
+                      }
                       final RestoData restoData =
                           restoDataFromJson(snapshot.data!);
                       return ListView.builder(

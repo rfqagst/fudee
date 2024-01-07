@@ -25,13 +25,50 @@ class RestoDetailScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                RestaurantImage(restaurant.pictureId),
+                Hero(
+                  tag: restaurant.pictureId,
+                  child: AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Image.network(
+                        restaurant.pictureId,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.error),
+                      ),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 20),
                 Row(
                   children: [
                     Column(
                       children: <Widget>[
-                        RestaurantInfo(restaurant: restaurant),
+                        Row(
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.place,
+                                  size: 25,
+                                  color: Colors.green,
+                                ),
+                                Text(
+                                  restaurant.city,
+                                  style: const TextStyle(fontSize: 20.0),
+                                ),
+                                const SizedBox(width: 10),
+                                const Icon(Icons.star,
+                                    size: 25, color: Colors.amber),
+                                Text(
+                                  restaurant.rating.toString(),
+                                  style: const TextStyle(fontSize: 20.0),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ],
@@ -41,13 +78,43 @@ class RestoDetailScreen extends StatelessWidget {
                   "Description",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
-                RestaurantDescription(restaurant.description),
+                Text(
+                  restaurant.description,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
                 const SizedBox(height: 20),
                 const Text(
                   "Menus",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
-                RestaurantMenus(restaurant: restaurant)
+                SizedBox(
+                  height: 200,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: restaurant.menus.foods.length +
+                        restaurant.menus.drinks.length,
+                    itemBuilder: (context, index) {
+                      bool isFood = index < restaurant.menus.foods.length;
+                      String itemName = isFood
+                          ? restaurant.menus.foods[index].name
+                          : restaurant
+                              .menus
+                              .drinks[index - restaurant.menus.foods.length]
+                              .name;
+                      IconData iconData =
+                          isFood ? Icons.fastfood : Icons.local_drink;
+
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        child: ListTile(
+                          leading: Icon(iconData),
+                          title: Text(itemName),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
           ),
@@ -57,109 +124,35 @@ class RestoDetailScreen extends StatelessWidget {
   }
 }
 
-class RestaurantImage extends StatelessWidget {
-  final String pictureUrl;
+// class RestaurantImage extends StatelessWidget {
+//   final String pictureUrl;
 
-  const RestaurantImage(this.pictureUrl);
+//   const RestaurantImage(this.pictureUrl);
 
-  @override
-  Widget build(BuildContext context) {
-    return Hero(
-      tag: pictureUrl,
-      child: AspectRatio(
-        aspectRatio: 16 / 9,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Image.network(
-            pictureUrl,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) =>
-                const Icon(Icons.error),
-          ),
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return 
+//   }
+// }
 
-class RestaurantInfo extends StatelessWidget {
-  final Restaurant restaurant;
+// class RestaurantInfo extends StatelessWidget {
+//   final Restaurant restaurant;
 
-  const RestaurantInfo({required this.restaurant});
+//   const RestaurantInfo({required this.restaurant});
 
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Row(
-          children: [
-            const Icon(
-              Icons.place,
-              size: 25,
-              color: Colors.green,
-            ),
-            Text(
-              restaurant.city,
-              style: const TextStyle(fontSize: 20.0),
-            ),
-            const SizedBox(width: 10),
-            const Icon(Icons.star, size: 25, color: Colors.amber),
-            Text(
-              restaurant.rating.toString(),
-              style: const TextStyle(fontSize: 20.0),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return 
+//   }
+// }
 
-class RestaurantDescription extends StatelessWidget {
-  final String description;
+// class RestaurantMenus extends StatelessWidget {
+//   final Restaurant restaurant;
 
-  const RestaurantDescription(this.description);
+//   const RestaurantMenus({required this.restaurant});
 
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      description,
-      overflow: TextOverflow.ellipsis,
-      maxLines: 2,
-    );
-  }
-}
-
-class RestaurantMenus extends StatelessWidget {
-  final Restaurant restaurant;
-
-  const RestaurantMenus({required this.restaurant});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 200,
-      child: ListView.builder(
-        shrinkWrap: true,
-        itemCount:
-            restaurant.menus.foods.length + restaurant.menus.drinks.length,
-        itemBuilder: (context, index) {
-          bool isFood = index < restaurant.menus.foods.length;
-          String itemName = isFood
-              ? restaurant.menus.foods[index].name
-              : restaurant
-                  .menus.drinks[index - restaurant.menus.foods.length].name;
-          IconData iconData = isFood ? Icons.fastfood : Icons.local_drink;
-
-          return Container(
-            margin: const EdgeInsets.symmetric(vertical: 4),
-            child: ListTile(
-              leading: Icon(iconData),
-              title: Text(itemName),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return 
+//   }
+// }
