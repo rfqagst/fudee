@@ -1,38 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:fudee/data/api/api_service.dart';
-import 'package:fudee/data/model/resto_detail.dart';
+import 'package:fudee/provider/restaurant_provider.dart';
+import 'package:provider/provider.dart';
 
-class RestoDetailScreen extends StatefulWidget {
+class RestoDetailScreen extends StatelessWidget {
   final String id;
   const RestoDetailScreen({Key? key, required this.id}) : super(key: key);
 
   @override
-  State<RestoDetailScreen> createState() => _RestoDetailScreenState();
-}
-
-class _RestoDetailScreenState extends State<RestoDetailScreen> {
-  late Future<RestoDetail> _restoDetail;
-
-  @override
-  void initState() {
-    super.initState();
-    _restoDetail = ApiService().getRestoDetail(widget.id);
-  }
-
-  @override
   Widget build(BuildContext context) {
+    Provider.of<RestaurantProvider>(context, listen: false)
+        .fetchRestaurantDetails(id);
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: FutureBuilder<RestoDetail>(
-            future: _restoDetail,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Text('Loading...'); // Display loading indicator
-              } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else if (snapshot.hasData) {
-                return Text(snapshot.data!.restaurant.name);
+          title: Consumer<RestaurantProvider>(
+            builder: (context, state, _) {
+              if (state.state == ResultState.loading) {
+                return const Text('Loading...'); // Display loading indicator
+              } else if (state.state == ResultState.error) {
+                return const Text('Error: Tidak dapat memuat data');
+              } else if (state.state == ResultState.hasData) {
+                return Text(state.resultDetail.restaurant.name);
               } else {
                 return Text('No Data');
               }
@@ -45,15 +34,12 @@ class _RestoDetailScreenState extends State<RestoDetailScreen> {
             },
           ),
         ),
-        body: FutureBuilder<RestoDetail>(
-          future: _restoDetail,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
+        body: Consumer<RestaurantProvider>(
+          builder: (context, state, _) {
+            if (state.state == ResultState.loading) {
               return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else if (snapshot.hasData) {
-              final restaurant = snapshot.data!.restaurant;
+            } else if (state.state == ResultState.hasData) {
+              final restaurant = state.resultDetail.restaurant;
               return SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -155,8 +141,24 @@ class _RestoDetailScreenState extends State<RestoDetailScreen> {
                   ),
                 ),
               );
+            } else if (state.state == ResultState.noData) {
+              return Center(
+                child: Material(
+                  child: Text(state.message),
+                ),
+              );
+            } else if (state.state == ResultState.error) {
+              return Center(
+                child: Material(
+                  child: Text(state.message),
+                ),
+              );
             } else {
-              return const Text('No Data');
+              return const Center(
+                child: Material(
+                  child: Text(''),
+                ),
+              );
             }
           },
         ),
