@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fudee/resto_list_screen.dart';
+import 'package:fudee/ui/resto_list_screen.dart';
 
 void main() {
   runApp(const MainApp());
