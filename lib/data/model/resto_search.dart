@@ -1,25 +1,16 @@
-// To parse this JSON data, do
-//
-//     final temperatures = temperaturesFromJson(jsonString);
 
-import 'dart:convert';
-
-Temperatures temperaturesFromJson(String str) => Temperatures.fromJson(json.decode(str));
-
-String temperaturesToJson(Temperatures data) => json.encode(data.toJson());
-
-class Temperatures {
+class RestoSearch {
     bool error;
     int founded;
     List<Restaurant> restaurants;
 
-    Temperatures({
+    RestoSearch({
         required this.error,
         required this.founded,
         required this.restaurants,
     });
 
-    factory Temperatures.fromJson(Map<String, dynamic> json) => Temperatures(
+    factory RestoSearch.fromJson(Map<String, dynamic> json) => RestoSearch(
         error: json["error"],
         founded: json["founded"],
         restaurants: List<Restaurant>.from(json["restaurants"].map((x) => Restaurant.fromJson(x))),

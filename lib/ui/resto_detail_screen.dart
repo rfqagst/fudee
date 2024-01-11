@@ -18,12 +18,10 @@ class RestoDetailScreen extends StatelessWidget {
             builder: (context, state, _) {
               if (state.state == ResultState.loading) {
                 return const Text('Loading...'); // Display loading indicator
-              } else if (state.state == ResultState.error) {
-                return const Text('Error: Tidak dapat memuat data');
               } else if (state.state == ResultState.hasData) {
                 return Text(state.resultDetail.restaurant.name);
               } else {
-                return Text('No Data');
+                return const Text('Error');
               }
             },
           ),
@@ -144,13 +142,17 @@ class RestoDetailScreen extends StatelessWidget {
             } else if (state.state == ResultState.noData) {
               return Center(
                 child: Material(
-                  child: Text(state.message),
+                  child: Center(
+                      child: Text(
+                    state.message,
+                    style: TextStyle(fontSize: 20),
+                  )),
                 ),
               );
             } else if (state.state == ResultState.error) {
               return Center(
                 child: Material(
-                  child: Text(state.message),
+                  child: Text(state.message, style: TextStyle(fontSize: 20)),
                 ),
               );
             } else {

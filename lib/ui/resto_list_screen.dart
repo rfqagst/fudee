@@ -9,28 +9,33 @@ class RestoListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          "Restaurants",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () async {
+              final String? query = await showSearch(
+                context: context,
+                delegate: RestaurantSearchDelegate(),
+              );
+              if (query != null && query.isNotEmpty) {
+                Provider.of<RestaurantProvider>(context, listen: false)
+                    .searchRestaurant(query);
+              }
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              const Column(
-                children: [
-                  Text(
-                    "Restaurants",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                  ),
-                  Text(
-                    "Recomendation Restaurant for you",
-                    style: TextStyle(fontSize: 15),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  )
-                ],
-              ),
               Expanded(
-                
                 child:
                     Consumer<RestaurantProvider>(builder: (context, state, _) {
                   if (state.state == ResultState.loading) {
@@ -119,13 +124,18 @@ class RestoListScreen extends StatelessWidget {
                   } else if (state.state == ResultState.noData) {
                     return Center(
                       child: Material(
-                        child: Text(state.message),
+                        child: Center(
+                            child: Text(
+                          state.message,
+                          style: const TextStyle(fontSize: 20),
+                        )),
                       ),
                     );
                   } else if (state.state == ResultState.error) {
                     return Center(
                       child: Material(
-                        child: Text(state.message),
+                        child:
+                            Text(state.message, style: const TextStyle(fontSize: 20)),
                       ),
                     );
                   } else {
@@ -142,5 +152,67 @@ class RestoListScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class RestaurantSearchDelegate extends SearchDelegate<String> {
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+          icon: const Icon(Icons.clear),
+          onPressed: () {
+            query = '';
+            showSuggestions(context);
+          }),
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () => close(context, ''));
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    Provider.of<RestaurantProvider>(context, listen: false)
+        .searchRestaurant(query);
+
+    return Consumer<RestaurantProvider>(
+      builder: (context, state, child) {
+        if (state.state == ResultState.loading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state.state == ResultState.hasData) {
+          return ListView.builder(
+            itemCount: state.result.restaurants.length,
+            itemBuilder: (context, index) {
+              var restaurant = state.result.restaurants[index];
+              return ListTile(
+                title: Text(restaurant.name),
+                subtitle: Text(restaurant.city),
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return RestoDetailScreen(id: restaurant.id);
+                  }));
+                },
+              );
+            },
+          );
+        } else if (state.state == ResultState.noData) {
+          return const Center(child: Text('No restaurants found.'));
+        } else if (state.state == ResultState.error) {
+          return Center(child: Text(state.message));
+        } else {
+          return const Center(child: Text(''));
+        }
+      },
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return Container();
   }
 }
